@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen bg-slate-100 p-4">
+  <div class="mx-auto w-full max-w-6xl">
+    <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
+        <p class="text-slate-600 text-sm mt-0.5">Visão geral de vendas e estoque (dados do navegador)</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          id="refreshBtn"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Atualizar
+        </button>
+        <a
+          href="../caixa/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Caixa
+        </a>
+        <a
+          href="../estoque/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Estoque
+        </a>
+        <a
+          href="../usuarios/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Usuários
+        </a>
+      </div>
+    </header>
+
+    <section
+      class="mb-6 rounded-2xl border border-dashed border-amber-200 bg-amber-50/60 px-4 py-4 sm:px-5"
+      aria-label="Dados de demonstração"
+    >
+      <p class="text-sm font-semibold text-amber-900">Demonstração (mock)</p>
+      <p class="text-xs text-amber-800/90 mt-1 max-w-3xl">
+        Gera vendas distribuídas nos últimos dias e um catálogo fictício de <strong>loja de tereré</strong> (ervas,
+        cuias, bombas, copos — sem foto) para preencher gráficos, KPIs e listas. Remove apenas registros
+        prefixados como demonstração; o restante do
+        <code class="rounded bg-white/80 px-1">localStorage</code> permanece.
+      </p>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button
+          type="button"
+          id="loadMockBtn"
+          class="rounded-xl bg-amber-600 text-white font-medium px-4 py-2 text-sm hover:bg-amber-700 transition"
+        >
+          Carregar demonstração
+        </button>
+        <button
+          type="button"
+          id="removeMockBtn"
+          class="rounded-xl border border-amber-300 bg-white text-amber-900 font-medium px-4 py-2 text-sm hover:bg-amber-100/80 transition"
+        >
+          Remover demonstração
+        </button>
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Indicadores</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm text-slate-500">💰 Faturamento (hoje)</p>
+          <p id="kpiFatDia" class="mt-2 text-xl font-bold text-slate-900 tabular-nums">R$ 0,00</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm text-slate-500">📅 Faturamento (mês)</p>
+          <p id="kpiFatMes" class="mt-2 text-xl font-bold text-slate-900 tabular-nums">R$ 0,00</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm text-slate-500">🛒 Vendas (mês)</p>
+          <p id="kpiQtdVendas" class="mt-2 text-xl font-bold text-slate-900 tabular-nums">0</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm text-slate-500">📦 Produtos vendidos (mês)</p>
+          <p id="kpiUnidadesMes" class="mt-2 text-xl font-bold text-slate-900 tabular-nums">0</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:col-span-2 lg:col-span-1">
+          <p class="text-sm text-slate-500">💵 Ticket médio (mês)</p>
+          <p id="kpiTicket" class="mt-2 text-xl font-bold text-slate-900 tabular-nums">R$ 0,00</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-800">Vendas ao longo do tempo</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Faturamento agregado por período (histórico do Caixa)</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="chartGranularity" class="text-sm text-slate-600">Agrupar por</label>
+          <select
+            id="chartGranularity"
+            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="dia">Dia</option>
+            <option value="semana">Semana</option>
+            <option value="mes">Mês</option>
+          </select>
+        </div>
+      </div>
+      <div class="h-72 w-full">
+        <canvas id="salesChart" aria-label="Gráfico de faturamento"></canvas>
+      </div>
+      <p id="chartEmpty" class="hidden text-center text-sm text-slate-500 py-12">Nenhuma venda registrada ainda. Finalize pedidos no Caixa.</p>
+    </section>
+
+    <section class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-800 mb-1">Melhores clientes</h2>
+      <p class="text-xs text-slate-500 mb-4">Ranking por total gasto · nº de pedidos (todas as vendas com cliente identificado)</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-200 text-left text-slate-500">
+              <th class="pb-2 pr-2 font-medium">#</th>
+              <th class="pb-2 pr-2 font-medium">Cliente</th>
+              <th class="pb-2 pr-2 font-medium text-right">Pedidos</th>
+              <th class="pb-2 font-medium text-right">Total gasto</th>
+            </tr>
+          </thead>
+          <tbody id="clientRankingBody"></tbody>
+        </table>
+      </div>
+      <p id="clientRankingEmpty" class="hidden text-sm text-slate-500 mt-4">Nenhuma venda com cliente identificado ainda.</p>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-slate-800 mb-1">Produtos mais vendidos</h2>
+        <p class="text-xs text-slate-500 mb-4">Nome · quantidade · receita (todas as vendas)</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 text-left text-slate-500">
+                <th class="pb-2 pr-2 font-medium">#</th>
+                <th class="pb-2 pr-2 font-medium">Produto</th>
+                <th class="pb-2 pr-2 font-medium text-right">Qtd.</th>
+                <th class="pb-2 font-medium text-right">Receita</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody"></tbody>
+          </table>
+        </div>
+        <p id="rankingEmpty" class="hidden text-sm text-slate-500 mt-4">Sem dados de venda ainda.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-slate-800 mb-1">Estoque</h2>
+        <p class="text-xs text-slate-500 mb-4">
+          Aviso: ≤ <span id="lowStockThresholdLabel">5</span> unidades (exceto zero). Total de unidades em estoque.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-xs font-medium text-amber-800">⚠️ Estoque baixo</p>
+            <p id="stockLowCount" class="mt-1 text-2xl font-bold text-amber-900">0</p>
+            <p class="text-xs text-amber-700 mt-1">produtos</p>
+          </div>
+          <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+            <p class="text-xs font-medium text-red-800">❌ Sem estoque</p>
+            <p id="stockZeroCount" class="mt-1 text-2xl font-bold text-red-900">0</p>
+            <p class="text-xs text-red-700 mt-1">produtos</p>
+          </div>
+          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <p class="text-xs font-medium text-emerald-800">📦 Total em estoque</p>
+            <p id="stockTotalUnits" class="mt-1 text-2xl font-bold text-emerald-900">0</p>
+            <p class="text-xs text-emerald-700 mt-1">unidades</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-700 mb-2">Estoque baixo</h3>
+            <ul id="listStockLow" class="space-y-2 max-h-48 overflow-y-auto text-sm"></ul>
+            <p id="listStockLowEmpty" class="hidden text-xs text-slate-500">Nenhum.</p>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-slate-700 mb-2">Sem estoque</h3>
+            <ul id="listStockZero" class="space-y-2 max-h-48 overflow-y-auto text-sm"></ul>
+            <p id="listStockZeroEmpty" class="hidden text-xs text-slate-500">Nenhum.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="./mock.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

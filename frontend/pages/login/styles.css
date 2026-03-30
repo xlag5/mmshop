@@ -1,0 +1,7 @@
+body {
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.card-login {
+  backdrop-filter: blur(4px);
+}

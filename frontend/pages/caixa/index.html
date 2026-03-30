@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caixa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen bg-slate-100 p-4">
+  <div class="mx-auto w-full max-w-5xl">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Caixa</h1>
+        <p class="text-slate-600 text-sm">Produtos disponíveis no sistema (mesmo cadastro do estoque)</p>
+        <p id="productCount" class="text-xs text-slate-500 mt-1"></p>
+        <p id="selectionCount" class="text-xs text-slate-600 mt-0.5"></p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <a
+          href="../dashboard/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Dashboard
+        </a>
+        <a
+          href="../estoque/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Ir para estoque
+        </a>
+        <a
+          href="../usuarios/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Ir para usuários
+        </a>
+        <a
+          href="../login/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Voltar ao login
+        </a>
+      </div>
+    </header>
+
+    <main class="pb-28">
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+      <div
+        id="emptyState"
+        class="hidden mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600"
+      >
+        Nenhum produto cadastrado ainda. Cadastre itens em
+        <a href="../estoque/index.html" class="text-blue-600 underline font-medium">Estoque</a>.
+      </div>
+    </main>
+  </div>
+
+  <button
+    type="button"
+    id="finalizeBtn"
+    class="fixed bottom-6 right-6 z-40 rounded-2xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-lg shadow-slate-900/20 hover:bg-blue-700 active:scale-[0.98] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+  >
+    Finalizar
+  </button>
+
+  <div id="checkoutModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+    <button
+      type="button"
+      id="checkoutBackdrop"
+      class="absolute inset-0 bg-slate-900/50 backdrop-blur-[1px]"
+      aria-label="Fechar resumo"
+    ></button>
+    <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+      <div
+        class="pointer-events-auto w-full max-w-md max-h-[85vh] flex flex-col rounded-2xl border border-slate-200 bg-white shadow-xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkoutTitle"
+      >
+        <div class="flex items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 shrink-0">
+          <div>
+            <h2 id="checkoutTitle" class="text-lg font-semibold text-slate-800">Resumo do pedido</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Produtos selecionados e total a pagar</p>
+          </div>
+          <button
+            type="button"
+            id="checkoutCloseBtn"
+            class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+          >
+            Fechar
+          </button>
+        </div>
+        <div id="checkoutBody" class="px-5 py-4 overflow-y-auto flex-1 min-h-0">
+          <div class="mb-4">
+            <label for="checkoutClienteSelect" class="block text-sm font-medium text-slate-700 mb-1">
+              Cliente
+            </label>
+            <select
+              id="checkoutClienteSelect"
+              name="checkoutCliente"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Selecione o cliente</option>
+            </select>
+            <p class="mt-1 text-xs text-slate-500">
+              Somente usuários cadastrados como cliente. Cadastre em <strong>Usuários</strong>.
+            </p>
+          </div>
+          <ul id="checkoutList" class="space-y-2"></ul>
+          <p id="checkoutEmpty" class="hidden text-sm text-slate-600 text-center py-6">
+            Selecione ao menos um produto para continuar.
+          </p>
+        </div>
+        <div class="border-t border-slate-100 px-5 py-4 shrink-0 rounded-b-2xl bg-slate-50/80">
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-sm font-medium text-slate-700">Total a pagar</span>
+            <span id="checkoutTotal" class="text-lg font-bold text-slate-900 tabular-nums">R$ 0,00</span>
+          </div>
+          <p id="checkoutFormError" class="mt-2 hidden text-sm text-red-600" role="alert"></p>
+          <button
+            type="button"
+            id="checkoutConfirmBtn"
+            class="mt-3 w-full rounded-xl bg-emerald-600 text-white font-semibold py-2.5 hover:bg-emerald-700 active:scale-[0.99] transition"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../components/productCard.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usuários</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen bg-slate-100 p-4">
+  <div class="mx-auto w-full max-w-5xl">
+    <header class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Usuários</h1>
+        <p class="text-slate-600 text-sm">Cadastre colaboradores e clientes</p>
+      </div>
+      <div class="flex items-center flex-wrap gap-2">
+        <a
+          href="../dashboard/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Dashboard
+        </a>
+        <a
+          href="../estoque/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Ir para estoque
+        </a>
+        <a
+          href="../caixa/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Ir para caixa
+        </a>
+        <a
+          href="../login/index.html"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+        >
+          Voltar ao login
+        </a>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <section class="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h2 id="userFormTitle" class="text-lg font-semibold text-slate-800">Novo usuário</h2>
+        <form id="userForm" class="mt-5 space-y-4">
+          <div>
+            <label for="nome" class="block text-sm font-medium text-slate-700 mb-1">Nome</label>
+            <input
+              id="nome"
+              name="nome"
+              type="text"
+              placeholder="Ex: Maria Silva"
+              class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              required
+              maxlength="120"
+            />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="maria@empresa.com"
+              class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="tipo" class="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
+            <select
+              id="tipo"
+              name="tipo"
+              class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
+              required
+            >
+              <option value="colaborador">Colaborador</option>
+              <option value="cliente">Cliente</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="senha" class="block text-sm font-medium text-slate-700 mb-1">Senha</label>
+            <input
+              id="senha"
+              name="senha"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            />
+            <p id="senhaHelp" class="text-xs text-slate-500 mt-1">Obrigatória para colaboradores.</p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button
+              type="submit"
+              id="submitUserBtn"
+              class="flex-1 rounded-xl bg-blue-600 text-white font-semibold py-2.5 hover:bg-blue-700 active:scale-[0.99] transition"
+            >
+              Cadastrar
+            </button>
+            <button
+              type="button"
+              id="cancelEditBtn"
+              class="hidden flex-1 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold py-2.5 hover:bg-slate-50 active:scale-[0.99] transition"
+            >
+              Cancelar edição
+            </button>
+          </div>
+
+          <p id="feedback" class="text-sm min-h-5"></p>
+        </form>
+      </section>
+
+      <section class="md:col-span-3">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold text-slate-800">Lista de usuários</h2>
+          <button
+            id="clearButton"
+            type="button"
+            class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+          >
+            Limpar lista
+          </button>
+        </div>
+
+        <div class="mb-4 flex items-center gap-2">
+          <button data-filter="todos" class="filter-btn rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">Todos</button>
+          <button data-filter="colaborador" class="filter-btn rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">Colaboradores</button>
+          <button data-filter="cliente" class="filter-btn rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">Clientes</button>
+        </div>
+
+        <div id="usersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+
+        <div id="emptyState" class="hidden mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">
+          Nenhum usuário cadastrado ainda.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../components/userCard.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
